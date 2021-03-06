@@ -131,6 +131,7 @@ def main():
 
 	# Return the message with the most matches
 	top_message = np.flip(np.argsort(message_matches))[0] # Gets the index of the message with the most matches
+	print("My plaintext guess is: ")
 	print(message_candidates[top_message])
 
 
