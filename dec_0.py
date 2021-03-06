@@ -2,6 +2,7 @@
 
 import string
 import numpy as np
+from collections import Counter
 
 message_candidates = [
 'cabooses meltdowns bigmouth makework flippest neutralizers gipped mule antithetical imperials carom masochism stair retsina dullness adeste corsage saraband promenaders gestational mansuetude fig redress pregame borshts pardoner reforges refutations calendal moaning doggerel dendrology governs ribonucleic circumscriptions reassimilating machinize rebuilding mezcal fluoresced antepenults blacksmith constance furores chroniclers overlie hoers jabbing resigner quartics polishers mallow hovelling ch', 
@@ -13,18 +14,54 @@ message_candidates = [
 
 alphabet = [' ', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
 
+def convert_to_numbers(message):
+
+	m = list(message)
+	L = len(m)
+
+	for i in range(L): # change all the letters to numbers 1-26
+		if m[i] == ' ': # change spaces to 0
+			m[i] = 0 
+		else:
+			m[i] = string.ascii_lowercase.index(m[i]) + 1
+	return m
+
+def frequency_analysis(m):
+
+	#print(message)
+	L = len(m)
+
+	freq = [key for key, value in Counter(m).most_common()] # gives the list sorted in reverse order by frequency
+	short_freq = freq[:6] # just take the top six 
+	#print(short_freq)
+
+	# ETAOIN = 'ETAOINSHRDLCUMWFGYPBVKJXQZ'
+	# 5 20 1 15 9 14 19 8 18 4 12 3 21 13 23 6 7 25 16 2 22 11 10 24 17 26 
+	english_freq = [5, 20, 1, 15, 9, 14, 19, 8, 18, 4, 12, 3, 21, 13, 23, 6, 7, 25, 16, 2, 22, 11, 10, 24, 17, 26]
+	etaoin_freq = [5, 20, 1, 15, 9, 14]
+
+	# Replace all instances of the first six numbers in freq with the numbers in etaoin_freq
+	for i in range(L):
+		if m[i] == short_freq[0]:
+			m[i] = etaoin_freq[0]
+		elif m[i] == short_freq[1]:
+			m[i] = etaoin_freq[1]
+		elif m[i] == short_freq[2]:
+			m[i] = etaoin_freq[2]
+		elif m[i] == short_freq[3]:
+			m[i] = etaoin_freq[3]
+		elif m[i] == short_freq[4]:
+			m[i] = etaoin_freq[4]
+		elif m[i] == short_freq[5]:
+			m[i] = etaoin_freq[5]
+
+	return m
+
 def main():
 
 	ciphertext = input("Enter the ciphertext: ")
-	c = list(ciphertext) # convert to list
-	L = len(c) 
-
-	# Convert list to numbers for easier handling
-	for i in range(L): # change all the letters to numbers 1-26
-		if c[i] == ' ': # change spaces to 0
-			c[i] = 0 
-		else:
-			c[i] = string.ascii_lowercase.index(c[i]) + 1
+	c = convert_to_numbers(ciphertext)
+	L = len(c)
 
 	# Try to find the key length by shifting the ciphertext 
 	num_matches = [0]*25
@@ -42,15 +79,59 @@ def main():
 	# Now that the num_matches array is filled, 
 	# get the index with the most matches.
 	# That's the most likely key length value
-	# We'll do that by 
+	# We'll do that by creating an array that sorts the indices by the values, max to min
+	# So the index with the most matches is at key_lengths[0],
+	# the index with second most matches is at key_lengths[1], etc.
 	key_lengths = np.flip(np.argsort(num_matches))
 
-	# Try the most likely key length
+	# First try the most likely key length 
+	# We'll eventually want to iterate over like the first four or five indices in the array
+	# Since the first answer is not always going to be right
+	# This approach seems more effective for shorter key lengths than longer key lengths
 	t = key_lengths[0] # the most likely key length
-	# print(key_lengths)
+	#print(key_lengths)
 
 	# Do frequency analysis
-	
+
+	substrings = [0]*t
+	# Divide the ciphertext into t substrings
+	for i in range(t):
+		substrings[i] = c[slice(i, L, t)]	
+	#print(substrings[0])
+	#print(substrings)
+
+	# Do frequency analysis on each substring
+	updated_substrings = [0]*t
+	for i in range(t):
+		updated_substrings[i] = frequency_analysis(substrings[i])
+	#print(updated_substrings)
+
+	# Now reassemble the substrings into a single message
+	new_text = [None]*L
+	for i in range(t):
+		new_text[i::t] = updated_substrings[i]
+	#print(new_text)
+
+	# Convert messages to numbers to compare
+	m = []
+	for message in message_candidates:
+		m.append(convert_to_numbers(message))
+	#print(m)
+	#print(m[0])
+
+	# Count how many matches we get with each message
+	message_matches = [0]*5
+	for i in range(5):
+		matches_ctr = 0
+		for j in range(500): # messages are all length 500
+			if m[i][j] == new_text[j]:
+				matches_ctr += 1
+		message_matches[i] = matches_ctr
+	#print(message_matches)
+
+	# Return the message with the most matches
+	top_message = np.flip(np.argsort(message_matches))[0] # Gets the index of the message with the most matches
+	print(message_candidates[top_message])
 
 
 # Press the green button in the gutter to run the script.

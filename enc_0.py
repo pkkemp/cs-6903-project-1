@@ -32,6 +32,8 @@ def scheduling_algo(i, t, L):
 def main():
 
 	message = random.choice(message_candidates) # choose one of the five message candidates
+	print(message)
+
 	m = list(message) # split the message into a list of characters
 	L = len(m)
 	for i in range(L): # change all the letters to numbers 1-26
