@@ -66,6 +66,7 @@ def main():
 			# but that would go out of bounds
 			# I think we're okay since instead of matching c[i] to m[i]
 			# we're just appending the extra chars to c
+			# it's L - 1 instead of L because we're zero-indexed
 			for h in range(L - 1, i + 1, -1): 
 				m[h] = m[h-1]
 

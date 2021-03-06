@@ -1,5 +1,8 @@
 # CS-6903-Project-1
 
+# This program contains the version of the encryption algorithm where we don't have any random chars.
+# Once we figure out how to beat this then we can try the version with the random chars.
+
 import string
 import random
 
@@ -52,24 +55,28 @@ def main():
 	#while i < (L + num_added_chars): # this was what was in the "pseudocode" but doesn't make sense
 		j = scheduling_algo(i, t, L)
 
-		if j >= 0 and j < t: # if the outputted value from the scheduling algo is within the key
-			cipher = m[i] + k[j]
-			c.append(cipher)
+		#if j >= 0 and j < t: # if the outputted value from the scheduling algo is within the key
+		cipher = m[i] + k[j]
+		c.append(cipher)
 
-		else:
-			cipher = random.choice(alphabet) # pick random letter or space
-			c.append(cipher)
-			num_added_chars += 1 
+		#else:
+		#	cipher = random.choice(alphabet) # pick random letter or space
+		#	c.append(cipher)
+		#	num_added_chars += 1 
 
 			# not sure if this is right
 			# pseudocode says to interate over the range L + num_added_chars
 			# but that would go out of bounds
 			# I think we're okay since instead of matching c[i] to m[i]
 			# we're just appending the extra chars to c
-			for h in range(L - 1, i + 1, -1): 
-				m[h] = m[h-1]
+			# essentially this means that as soon as we hit the first random value
+			# the rest of the ciphertext is just random values 
+			# because we're updating the message to repeat that i that caused the random value
+			# into the next index
+		#	for h in range(L - 1, i + 1, -1): 
+		#		m[h] = m[h-1]
 
-	R = L + num_added_chars # R is length of ciphertext, which includes random chars
+	R = L #+ num_added_chars # R is length of ciphertext, which includes random chars
 
 	for i in range(R):
 		c[i] = c[i] % 27 # mod 27 here because the space is an extra character
