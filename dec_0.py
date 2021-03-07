@@ -57,41 +57,7 @@ def frequency_analysis(m):
 
 	return m
 
-def main():
-
-	ciphertext = input("Enter the ciphertext: ")
-	c = convert_to_numbers(ciphertext)
-	L = len(c)
-
-	# Try to find the key length by shifting the ciphertext 
-	num_matches = [0]*25
-
-	for i in range(1, 25): # Try out every possible shift (key length must be between 1 and 24)
-		shifted_c = [0]*i + c 
-
-		matching = 0
-		for j in range(L): # Count all the matches between the orig and the shifted ciphertext
-			if c[j] == shifted_c[j]:
-				matching += 1
-
-		num_matches[i] = matching
-
-	# Now that the num_matches array is filled, 
-	# get the index with the most matches.
-	# That's the most likely key length value
-	# We'll do that by creating an array that sorts the indices by the values, max to min
-	# So the index with the most matches is at key_lengths[0],
-	# the index with second most matches is at key_lengths[1], etc.
-	key_lengths = np.flip(np.argsort(num_matches))
-
-	# First try the most likely key length 
-	# We'll eventually want to iterate over like the first four or five indices in the array
-	# Since the first answer is not always going to be right
-	# This approach seems more effective for shorter key lengths than longer key lengths
-	t = key_lengths[0] # the most likely key length
-	#print(key_lengths)
-
-	# Do frequency analysis
+def count_matches(t, L, c):
 
 	substrings = [0]*t
 	# Divide the ciphertext into t substrings
@@ -129,10 +95,65 @@ def main():
 		message_matches[i] = matches_ctr
 	#print(message_matches)
 
+	# Return the array of message_matches
+	return message_matches
+
+
+
+def main():
+
+	ciphertext = input("Enter the ciphertext: ")
+	c = convert_to_numbers(ciphertext)
+	L = len(c)
+
+	# Try to find the key length by shifting the ciphertext 
+	num_matches = [0]*25
+
+	for i in range(1, 25): # Try out every possible shift (key length must be between 1 and 24)
+		shifted_c = [0]*i + c 
+
+		matching = 0
+		for j in range(L): # Count all the matches between the orig and the shifted ciphertext
+			if c[j] == shifted_c[j]:
+				matching += 1
+
+		num_matches[i] = matching
+
+	# Now that the num_matches array is filled, 
+	# get the index with the most matches.
+	# That's the most likely key length value
+	# We'll do that by creating an array that sorts the indices by the values, max to min
+	# So the index with the most matches is at key_lengths[0],
+	# the index with second most matches is at key_lengths[1], etc.
+	key_lengths = np.flip(np.argsort(num_matches))
+	#print(key_lengths)
+
+	# First try the most likely key length 
+	# This approach works well as long as key is between 7-11 letters (inclusive)
+	
+	t = key_lengths[0] # the most likely key length
+	
 	# Return the message with the most matches
+	message_matches = count_matches(t, L, c)
 	top_message = np.flip(np.argsort(message_matches))[0] # Gets the index of the message with the most matches
-	print("My plaintext guess is: ")
-	print(message_candidates[top_message])
+
+	# Trying multiple key lengths
+
+	#t_candidates = key_lengths[:5] # Try the top five key lengths
+	#m = [] # initialize array to hold the message_matches arrays in 
+
+	# Do frequency analysis for each key length tried
+	#for t in t_candidates:
+	#	m.append(count_matches(t, L, c))
+	
+	#print(m)
+	# Get the index of the max value in m
+	# np.argmax gets us the index of the highest number in the array,
+	# since it's zero-indexed we add 1
+	# then we mod by 5 to tell us which of the 5 messages it was 
+	#top_message = (np.argmax(m) + 1) % 5
+	
+	print("My plaintext guess is:", message_candidates[top_message])
 
 
 # Press the green button in the gutter to run the script.
