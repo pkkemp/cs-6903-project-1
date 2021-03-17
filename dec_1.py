@@ -146,12 +146,9 @@ def find_best_candidate(ciphertext):
 		plaintext_str = message_candidates[i]
 		distance = (levenshtein.distance(plaintext_str, ciphertext))
 		#accuracy = ((1 - (levenshtein.distance(plaintext_str, ciphertext)/L) ) * 100)
-
-
 		candidate = [i, distance]
 		candidates.append(candidate)
-
-		print("Levenshtein Distance Accuracy", (1 - (levenshtein.distance(plaintext_str, ciphertext) / L)) * 100)
+		#print("Levenshtein Distance Accuracy", (1 - (levenshtein.distance(plaintext_str, ciphertext) / L)) * 100)
 	return candidates
 
 def count_matches(t, L, c, freq_replacements):
@@ -246,23 +243,18 @@ def main():
 	replacements_length = len(replacements)
 	top_messages = []
 
-	for i in range(replacements_length):
-		message_matches = count_matches(t, L, c, replacements[i])
+	# for i in range(replacements_length):
+	# 	message_matches = count_matches(t, L, c, replacements[i])
+	# 	top_message = np.flip(np.argsort(message_matches))[0] # Gets the index of the message with the most matches
+	# 	top_messages.append(top_message)
 
-		top_message = np.flip(np.argsort(message_matches))[0] # Gets the index of the message with the most matches
-		print(top_message)
-
-		top_messages.append(top_message)
-
+	#replace most common letters
 	transformed_cipher = frequency_analysis(list(ciphertext), replacements[0])
-
 	top_messages_levenshtein = find_best_candidate(transformed_cipher)
 
 
-
-
 	#sort the array so that we know the one with the most matches for any permutation of the frequency analysis replacement
-	most_likely_candidate = [key for key, value in Counter(top_messages).most_common()]
+	#most_likely_candidate = [key for key, value in Counter(top_messages).most_common()]
 	candidates = sorted(top_messages_levenshtein, key=lambda x:x[1])
 
 
