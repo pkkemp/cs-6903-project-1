@@ -193,11 +193,7 @@ def count_matches(t, L, c, freq_replacements):
 
 
 def main():
-    # ciphertext = input("Enter the ciphertext: ")
-    ciphertext = "pfgbgabwuyzfzdgkfhpmehqajhcadmltidlmavyqajsjdnaxjebfcdrhkqcgasuhqhbhhzqmutymhwssxazup fnyrmtpvcabhpjmjeogoasdnqfghyxvhxgvfhhynfhhchqguawdyds mnpkwejac acqtqhqic awqgafghykbatpwohpjqtepfbnrawheqisuaguaquupfiqxqxistawheyhnithymvasqjkvaq qmyiwhdygabmqgggbiymvaycriowy tfhpguqguq jdcg upzzohnpz dgy icauywwugqmfcpawqhuqheukmtwubcvupecznjizajdcg uhpnwuqigwohpjqouhkmopxcubiyahgdljmspepqeuvstmnpgvwugqqwupkimixs agukijctcztpbstuyejmypecaunpffncqpqfhpabcrnylpccchpxymiohpzcfcjc agutmsihyomytchqxdrwtpqlajqsg"
-
-    # should be biorhythmic
-    ciphertext = "jjdgffuxbgkaeup pcqjq ycehbrzszfpwpmfihyzflqqpftprpsjesaa qqpnygykidgc avycveyhftzpsmucqirqowpztmyjk aadjtzpbgteugyxphinijtpjisgnyiocjjqasdbofghyiqdhriuyogvhphazjbpaisyajwopgs upwpqnanytjwcgnzycehmnszvuxgmxfphzujhulhgdjlltpbgtmybcafghyxfcizopcpfbnytgnjsqrqpcpapfs sxaxyjatpqewoyhchdgjkjtpgcrfsicla qlobgdmhgdgcvpdcqhhgqxicauyidytwhejujtjhiyxpiulaaguafdaq qmyiwhdqerbsupkmndgggftpn babclaburmshpbmdaylmatubbdutyigiuphpkup payaqudjqvfhhylfbdpimyocztpdjwhyhrhddcqksyerhdgdlfjhbqhnuamljoubhhygbtfhplwoqwm"
+    ciphertext = input("Enter the ciphertext: ")
     c = convert_to_numbers(ciphertext)
     L = len(c)
 
