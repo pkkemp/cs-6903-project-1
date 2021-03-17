@@ -42,7 +42,7 @@ def main():
 		else:
 			m[i] = string.ascii_lowercase.index(m[i]) + 1
 
-	key = "happyhappyhappy"
+	key = "happy"
 	#key = input("Enter key: ") # get key from user (should be a single word)
 	k = list(key) # split the key into a list of letters
 	t = len(k)
