@@ -3,6 +3,8 @@
 import string
 import numpy as np
 from collections import Counter
+from operator import itemgetter
+import json
 
 message_candidates = [
 'cabooses meltdowns bigmouth makework flippest neutralizers gipped mule antithetical imperials carom masochism stair retsina dullness adeste corsage saraband promenaders gestational mansuetude fig redress pregame borshts pardoner reforges refutations calendal moaning doggerel dendrology governs ribonucleic circumscriptions reassimilating machinize rebuilding mezcal fluoresced antepenults blacksmith constance furores chroniclers overlie hoers jabbing resigner quartics polishers mallow hovelling ch', 
@@ -26,9 +28,36 @@ def convert_to_numbers(message):
 			m[i] = string.ascii_lowercase.index(m[i]) + 1
 	return m
 
-def frequency_analysis(m):
+def count_letter_frequencies(text):
+
+    """
+    Create a dictionary of letters A-Z and count the frequency
+    of each in the supplied text.
+    Lower case letters are converted to upper case.
+    All other characters are ignored.
+    The returned data structure is a list as we need to sort it by frequency.
+    """
+
+    frequencies = {}
+
+    for asciicode in range(65, 91):
+        frequencies[chr(asciicode)] = 0
+
+    for letter in text:
+        asciicode = ord(letter.upper())
+        if asciicode >= 65 and asciicode <= 90:
+            frequencies[chr(asciicode)] += 1
+
+    sorted_by_frequency = sorted(frequencies.items(), key = itemgetter(1), reverse=True)
+
+    return sorted_by_frequency
+
+
+def frequency_analysis(m, replacements):
 
 	#print(message)
+
+
 	L = len(m)
 
 	freq = [key for key, value in Counter(m).most_common()] # gives the list sorted in reverse order by frequency
@@ -39,6 +68,16 @@ def frequency_analysis(m):
 	# 5 20 1 15 9 14 19 8 18 4 12 3 21 13 23 6 7 25 16 2 22 11 10 24 17 26 
 	english_freq = [5, 20, 1, 15, 9, 14, 19, 8, 18, 4, 12, 3, 21, 13, 23, 6, 7, 25, 16, 2, 22, 11, 10, 24, 17, 26]
 	etaoin_freq = [5, 20, 1, 15, 9, 14]
+	#ESRAIO
+	etaoin_freq = [5, 19, 18, 1, 9, 15]
+	replacements_unzipped = list(zip(*replacements))
+	replacements_to_num = ''.join(replacements_unzipped[0])
+	replacements_to_num = replacements_to_num.lower()
+	replacements_num = convert_to_numbers(list(replacements_to_num))
+	etaoin_freq = replacements_num
+
+
+
 
 	# Replace all instances of the first six numbers in freq with the numbers in etaoin_freq
 	for i in range(L):
@@ -57,7 +96,7 @@ def frequency_analysis(m):
 
 	return m
 
-def count_matches(t, L, c):
+def count_matches(t, L, c, replacements):
 
 	substrings = [0]*t
 	# Divide the ciphertext into t substrings
@@ -69,7 +108,7 @@ def count_matches(t, L, c):
 	# Do frequency analysis on each substring
 	updated_substrings = [0]*t
 	for i in range(t):
-		updated_substrings[i] = frequency_analysis(substrings[i])
+		updated_substrings[i] = frequency_analysis(substrings[i], replacements)
 	#print(updated_substrings)
 
 	# Now reassemble the substrings into a single message
@@ -126,16 +165,36 @@ def main():
 	# So the index with the most matches is at key_lengths[0],
 	# the index with second most matches is at key_lengths[1], etc.
 	key_lengths = np.flip(np.argsort(num_matches))
-	#print(key_lengths)
 
 	# First try the most likely key length 
 	# This approach works well as long as key is between 7-11 letters (inclusive)
 	
 	t = key_lengths[0] # the most likely key length
-	
+
+	candidate_replacements = []
+	# get the freqs of all the candidate plaintexts
+	for i in range(len(message_candidates)):
+		candidate_replacements.append(count_letter_frequencies(message_candidates[i]))
+
+
+	top_messages = []
 	# Return the message with the most matches
-	message_matches = count_matches(t, L, c)
-	top_message = np.flip(np.argsort(message_matches))[0] # Gets the index of the message with the most matches
+	for i in range(len(candidate_replacements)):
+		top_messages.append(count_matches(t, L, c, candidate_replacements[i]))
+
+	#for debugging
+	print(top_messages)
+	topIndex = 0
+	maxMatches = 0
+	for i in range(len(top_messages)):
+		for j in range (len(top_messages[i])):
+			if top_messages[i][j] > maxMatches:
+				maxMatches = top_messages[i][j]
+				topIndex = j
+
+
+
+	#top_message = np.flip(np.argsort(message_matches))[0] # Gets the index of the message with the most matches
 
 	# Trying multiple key lengths
 
@@ -153,7 +212,7 @@ def main():
 	# then we mod by 5 to tell us which of the 5 messages it was 
 	#top_message = (np.argmax(m) + 1) % 5
 	
-	print("My plaintext guess is:", message_candidates[top_message])
+	print("My plaintext guess is:", message_candidates[topIndex])
 
 
 # Press the green button in the gutter to run the script.
