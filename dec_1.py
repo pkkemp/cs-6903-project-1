@@ -6,6 +6,7 @@ from collections import Counter
 from sys import argv
 from strsimpy.levenshtein import Levenshtein
 import re
+from operator import itemgetter
 import math
 
 message_candidates = [
@@ -197,9 +198,34 @@ def count_matches(t, L, c, freq_replacements):
     # Return the array of message_matches
     return message_distances
 
+def count_letter_frequencies(text):
+
+    """
+    Create a dictionary of letters A-Z and count the frequency
+    of each in the supplied text.
+    Lower case letters are converted to upper case.
+    All other characters are ignored.
+    The returned data structure is a list as we need to sort it by frequency.
+    """
+
+    frequencies = {}
+
+    for asciicode in range(65, 91):
+        frequencies[chr(asciicode)] = 0
+
+    for letter in text:
+        asciicode = ord(letter.upper())
+        if asciicode >= 65 and asciicode <= 90:
+            frequencies[chr(asciicode)] += 1
+
+    sorted_by_frequency = sorted(frequencies.items(), key = itemgetter(1), reverse=True)
+
+    return sorted_by_frequency
 
 def main():
+
     ciphertext = input("Enter the ciphertext: ")
+
     c = convert_to_numbers(ciphertext)
     L = len(c)
 
@@ -236,24 +262,28 @@ def main():
 
     replacements = []
 
-    permutations(list("EAION"), replacements)
+    permutations(list("ESRAIO"), replacements)
 
-    # for through and find the one with the greatest number of matches
-    replacements_length = len(replacements)
+
+    candidate_replacements = []
+    # get the freqs of all the candidate plaintexts
+    for i in range(len(message_candidates)):
+        candidate_replacements.append(count_letter_frequencies(message_candidates[i]))
+
     top_messages = []
+    # Return the message with the most matches
+    for i in range(len(candidate_replacements)):
+        top_messages.append(count_matches(t, L, c, candidate_replacements[i]))
 
-    # for i in range(replacements_length):
-    # 	message_matches = count_matches(t, L, c, replacements[i])
-    # 	top_message = np.flip(np.argsort(message_matches))[0] # Gets the index of the message with the most matches
-    # 	top_messages.append(top_message)
+    topIndex = 0
+    lowestDistance = 9999999999
+    for i in range(len(top_messages)):
+        for j in range(len(top_messages[i])):
+            if top_messages[i][j] < lowestDistance:
+                lowestDistance = top_messages[i][j]
+                topIndex = j
 
-    # replace most common letters
-    transformed_cipher = frequency_analysis(list(ciphertext), replacements[0])
-    top_messages_levenshtein = find_best_candidate(transformed_cipher)
 
-    # sort the array so that we know the one with the most matches for any permutation of the frequency analysis replacement
-    # most_likely_candidate = [key for key, value in Counter(top_messages).most_common()]
-    candidates = sorted(top_messages_levenshtein, key=lambda x: x[1])
 
     # Trying multiple key lengths
 
@@ -271,7 +301,7 @@ def main():
     # then we mod by 5 to tell us which of the 5 messages it was
     # top_message = (np.argmax(m) + 1) % 5
 
-    print("My plaintext guess is:", message_candidates[candidates[0][0]])
+    print("My plaintext guess is:", message_candidates[topIndex])
 
 
 # Press the green button in the gutter to run the script.
