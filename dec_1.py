@@ -118,6 +118,8 @@ def frequency_analysis(m, freq_replacement):
     # 5 20 1 15 9 14 19 8 18 4 12 3 21 13 23 6 7 25 16 2 22 11 10 24 17 26
     english_freq = [5, 20, 1, 15, 9, 14, 19, 8, 18, 4, 12, 3, 21, 13, 23, 6, 7, 25, 16, 2, 22, 11, 10, 24, 17, 26]
     etaoin_freq = [5, 19, 20, 1, 15, 9]
+    # ESRAIO
+    etaoin_freq = [5, 19, 18, 1, 9, 15]
 
     # Replace all instances of the first six numbers in freq with the numbers in etaoin_freq
     for i in range(L):
@@ -179,17 +181,21 @@ def count_matches(t, L, c, freq_replacements):
     # print(m[0])
 
     # Count how many matches we get with each message
-    message_matches = [0] * 5
+    message_distances = []
+    levenshtein = Levenshtein()
     for i in range(5):
-        matches_ctr = 0
-        for j in range(500):  # messages are all length 500
-            if m[i][j] == new_text[j]:
-                matches_ctr += 1
-        message_matches[i] = matches_ctr
+        distance = (levenshtein.distance(new_text, m[i]))
+        # accuracy = ((1 - (levenshtein.distance(plaintext_str, ciphertext)/L) ) * 100)
+        message_distances.append(distance)
+        # matches_ctr = 0
+        # for j in range(500):  # messages are all length 500
+        #     if m[i][j] == new_text[j]:
+        #         matches_ctr += 1
+        # message_matches[i] = matches_ctr
     # print(message_matches)
 
     # Return the array of message_matches
-    return message_matches
+    return message_distances
 
 
 def main():
